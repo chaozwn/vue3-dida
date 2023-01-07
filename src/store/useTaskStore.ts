@@ -52,14 +52,6 @@ export const useTaskStore = defineStore('task', () => {
     changeActiveTask(undefined)
   }
 
-  function shouldShowTodoAdd() {
-    const name = currentActiveProject.value?.name
-    return (
-      name !== (SpecialProjectNames.Complete as string)
-      && name !== SpecialProjectNames.Trash && name !== SpecialProjectNames.Failed && name !== SpecialProjectNames.Abstract
-    )
-  }
-
   function exchangeTwoTaskByIndex(index1: number, index2: number) {
     const task1 = currentActiveProject.value?.tasks[index1]
     const task2 = currentActiveProject.value?.tasks[index2]
@@ -81,7 +73,6 @@ export const useTaskStore = defineStore('task', () => {
     restoreTask,
     changeActiveTask,
     changeCurrentActiveProject,
-    shouldShowTodoAdd,
     exchangeTwoTaskByIndex,
   }
 })

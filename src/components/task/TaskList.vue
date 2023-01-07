@@ -6,7 +6,6 @@ import { useEventListener } from '@vueuse/core'
 import draggable from 'vuedraggable'
 import TaskItem from './TaskItem.vue'
 import { SpecialProjectNames, useTaskStore } from '@/store'
-import { useTaskStore } from '@/store/task'
 import { isDark } from '@/composable/dark'
 
 const taskStore = useTaskStore()
@@ -77,7 +76,6 @@ function useInput() {
 const { inputRef, onFocus } = useInput()
 
 const dragging = ref<boolean>(false)
-const enabled = ref<boolean>(true)
 const checkMove = (e: any) => {
   const currentIndex = e.draggedContext.index
   const futureIndex = e.draggedContext.futureIndex
