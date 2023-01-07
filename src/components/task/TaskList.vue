@@ -3,9 +3,11 @@ import type { Ref } from 'vue'
 import { computed, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useEventListener } from '@vueuse/core'
-
+import draggable from 'vuedraggable'
 import TaskItem from './TaskItem.vue'
+
 import { useTaskStore } from '@/store/task'
+import { isDark } from '@/composable/dark'
 
 const taskStore = useTaskStore()
 
@@ -54,6 +56,16 @@ useEventListener(
     classList.remove('dark:color-black')
   },
 )
+
+const dragging = ref<boolean>(false)
+const enabled = ref<boolean>(true)
+const checkMove = (e: any) => {
+  const currentIndex = e.draggedContext.index
+  const futureIndex = e.draggedContext.futureIndex
+  // 貌似vue3的响应机制太牛了，taskstore的task顺序(currentActiveProject和projects中对应的部分)，直接就变了，不需要再手动去改变了
+  // 如果后端要改，这个位置调用接口就行了
+  // taskStore.exchangeTwoTaskByIndex(currentIndex, futureIndex)
+}
 </script>
 
 <template>
@@ -87,11 +99,26 @@ useEventListener(
         {{ placeholderText }}
       </div>
     </div>
-    <TransitionGroup name="list" tag="ul" class="flex flex-col gap-10px">
-      <li v-for="task in taskStore.currentActiveProject?.tasks" :key="task.id">
-        <TaskItem :task="task" />
-      </li>
-    </TransitionGroup>
+    <draggable
+      :list="taskStore.currentActiveProject?.tasks ?? []"
+      :ghost-class="isDark ? 'dark-ghost' : 'ghost'"
+      :drag-class="isDark ? 'dark-drag' : 'drag'"
+      item-key="id"
+      :animation="200"
+      :component-data="{
+        tag: 'div',
+        type: 'transition-group',
+        name: !dragging ? 'flip-list' : null,
+      }"
+      class="flex flex-col gap-10px"
+      :move="checkMove"
+      @start="dragging = true"
+      @end="dragging = false"
+    >
+      <template #item="{ element, index }">
+        <TaskItem :task="element" :index="index" class="item" />
+      </template>
+    </draggable>
     <!-- 暂时性修复 contenteditable 的 bug #9 -->
     <div class="w-full h-1px" contenteditable="false" />
   </div>
@@ -105,5 +132,25 @@ useEventListener(
 .list-enter-from {
   opacity: 0;
   transform: translateX(30px);
+}
+
+.ghost {
+  opacity: 0.5;
+  background: #c8ebfb;
+}
+
+.dark-ghost {
+  opacity: 0.4;
+  background: #2f2f2f;
+}
+
+.drag {
+  opacity: 0.5;
+  background: #c8ebfb;
+}
+
+.dark-drag {
+  opacity: 0.4;
+  background: #2f2f2f;
 }
 </style>

@@ -16,6 +16,7 @@ export interface Task {
   state: TaskState
   project?: Project
   previousProject?: Project
+  order?: number
 }
 
 export function createTask(title: string, id: string = nanoid()): Task {
